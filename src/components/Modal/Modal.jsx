@@ -1,43 +1,38 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Overlay, ModalWindow } from './Modal.styled';
 
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
+export function Modal({ onClick, largeImageURL }) {
+  useEffect(() => {
+    const handleKeyDown = event => {
+      console.log(event.code);
+      if (event.code === 'Escape') {
+        onClick();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClick]);
 
-  handleKeyDown = event => {
-    if (event.code === 'Escape') {
-      this.props.onClick();
-    }
-  };
-
-  handleBdClick = event => {
+  const handleBdClick = event => {
     if (event.currentTarget === event.target) {
-      this.props.onClick();
+      onClick();
     }
   };
 
-  render() {
-    const { largeImageURL } = this.props;
-    return (
-      <Overlay onClick={this.handleBdClick}>
-        <ModalWindow>
-          <img src={largeImageURL} alt="" />
-        </ModalWindow>
-      </Overlay>
-    );
-    //   );
-  }
+  return (
+    <Overlay onClick={handleBdClick}>
+      <ModalWindow>
+        <img src={largeImageURL} alt="" />
+      </ModalWindow>
+    </Overlay>
+  );
 }
 
 Modal.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
-  tags: PropTypes.string,
   handleBdClick: PropTypes.func,
   handleKeyDown: PropTypes.func,
 };
